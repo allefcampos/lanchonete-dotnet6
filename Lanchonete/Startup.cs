@@ -2,6 +2,7 @@
 using Lanchonete.Models;
 using Lanchonete.Repositories;
 using Lanchonete.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lanchonete;
@@ -21,9 +22,14 @@ public class Startup
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+        services.AddIdentity<IdentityUser, IdentityRole>()
+             .AddEntityFrameworkStores<AppDbContext>()
+             .AddDefaultTokenProviders();
+
         // Injetar os repositórios.
         services.AddTransient<ILancheRepository, LancheRepository>();
         services.AddTransient<ICategoriaRepository, CategoriaRepository>();
+        services.AddTransient<IPedidoRepository, PedidoRepository>();
 
         services.AddScoped(sp => CarrinhoCompra.GetCarrinho(sp));
 
@@ -53,6 +59,7 @@ public class Startup
         app.UseRouting();
         app.UseSession();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
